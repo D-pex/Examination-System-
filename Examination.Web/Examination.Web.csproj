@@ -7,7 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Examination.Core\Examination.Core.csproj" />
+      <ProjectReference Include="..\Examination.Persistence\Examination.Persistence.csproj" />
+      <ProjectReference Include="..\Examination.Services\Examination.Services.csproj" />
     </ItemGroup>
 
 </Project>
