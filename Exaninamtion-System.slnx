@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Examination.Core/Examination.Core.csproj" Id="d49afc6a-97e0-4f0e-8872-e9f7a13f3fe6" />
+  <Project Path="Examination.Persistence/Examination.Persistence.csproj" Id="1f8f1fc4-d01f-49ae-a5ee-8214e8d1863a" />
+  <Project Path="Examination.Services/Examination.Services.csproj" Id="33afa339-6cf9-474c-9b96-0b4b4a8430e1" />
+  <Project Path="Examination.Web/Examination.Web.csproj" />
+</Solution>
