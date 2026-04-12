@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Examination.Core.Requests;
 
-namespace Examination.Core.Requests;
-
-public sealed record CreateOptionRequest
+public sealed class CreateOptionRequest
 {
-    public string Text { get; set; }
+    public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
 }

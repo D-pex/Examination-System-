@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Examination.Core.Requests;
 
-namespace Examination.Core.Requests;
-
-public sealed record CreateQuestionRequest
+public sealed class CreateQuestionRequest
 {
-public int  TestId { get; set; }
-public string QuestionText { get; set; }
-List<CreateOptionRequest> Options  { get; set; }
+    public int TestId { get; set; }
+    public string QuestionText { get; set; } = string.Empty;
+    public List<CreateOptionRequest> Options { get; set; } = new();
 }
