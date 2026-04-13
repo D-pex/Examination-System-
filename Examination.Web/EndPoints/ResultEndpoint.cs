@@ -1,6 +1,5 @@
 using Examination.Services;
 using Examination.Services.Exceptions;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Examination.Web.EndPoints;
 

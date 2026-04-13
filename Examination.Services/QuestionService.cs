@@ -65,7 +65,6 @@ public sealed class QuestionService
             throw new ConflictException("Test does not exist");
 
         var questions = _dbContext.Questions
-         
             .Where(q => q.TestId == testId)
             .Include(q => q.Options)
             .ToList();

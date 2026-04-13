@@ -3,9 +3,6 @@ using Examination.Core.Requests;
 using Examination.Persistence;
 using Examination.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 public sealed class TestService
 {
@@ -28,21 +25,21 @@ public sealed class TestService
         if (existing != null)
             throw new ConflictException("Test already exists");
 
-        
+
         var test = new Test
         {
-            Name        = request.Name.Trim(),
-            Subject     = request.Subject?.Trim() ?? "",
+            Name = request.Name.Trim(),
+            Subject = request.Subject?.Trim() ?? "",
             Description = request.Description?.Trim() ?? "",
-            Duration    = request.Duration,
+            Duration = request.Duration,
             IsPublished = false,
-            CreatedAt   = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Tests.Add(test);
         _dbContext.SaveChanges();
 
-       
+
         return new TestDto(
             test.Id,
             test.Name,
@@ -71,13 +68,12 @@ public sealed class TestService
 
     public List<TestDto> GetPublishedTests()
     {
-      
         return _dbContext.Tests
             .Where(t => t.IsPublished)
             .Select(t => new TestDto(
                 t.Id,
-                t.Name        ?? "",
-                t.Subject     ?? "",
+                t.Name ?? "",
+                t.Subject ?? "",
                 t.Description ?? "",
                 t.Duration,
                 t.IsPublished,
@@ -98,11 +94,11 @@ public sealed class TestService
         if (test == null)
             throw new NotFoundException($"Test with ID {id} not found");
 
-       
+
         return new TestDto(
             test.Id,
-            test.Name        ?? "",
-            test.Subject     ?? "",
+            test.Name ?? "",
+            test.Subject ?? "",
             test.Description ?? "",
             test.Duration,
             test.IsPublished,

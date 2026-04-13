@@ -1,7 +1,6 @@
 using Examination.Core.Requests;
 using Examination.Persistence;
 using Examination.Services.Exceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Examination.Services;
 
@@ -16,7 +15,8 @@ public sealed class UserService
 
     public object Register(CreateUserRequest request)
     {
-        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.Name))
+        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) ||
+            string.IsNullOrEmpty(request.Name))
             throw new ConflictException("Invalid data");
 
         var exists = _dbContext.Users
@@ -51,7 +51,6 @@ public sealed class UserService
             throw new ConflictException("Invalid credentials");
 
         var user = _dbContext.Users
-          
             .FirstOrDefault(u => u.Email == email && u.Password == password);
 
         if (user == null)

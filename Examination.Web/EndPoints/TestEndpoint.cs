@@ -1,8 +1,5 @@
-﻿
-using Examination.Core.Dtos;
+﻿using Examination.Core.Dtos;
 using Examination.Core.Requests;
-using Examination.Persistence;
-using Examination.Services;
 using Examination.Services.Exceptions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -31,7 +28,7 @@ public static class TestEndpoints
 
         return endpoints;
     }
-    
+
     private static IResult CreateTest(TestService service, CreateTestRequest request)
     {
         try

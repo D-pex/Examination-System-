@@ -1,8 +1,7 @@
 using Examination.Core.Dtos;
 using Examination.Core.Requests;
 using Examination.Persistence;
-using Examination.Services.Exceptions; 
-using Microsoft.EntityFrameworkCore;
+using Examination.Services.Exceptions;
 
 namespace Examination.Services;
 
@@ -24,7 +23,7 @@ public sealed class TestAttemptService
         if (!userExists)
             throw new ConflictException("User not found");
 
-        var test = _dbContext.Tests.Find(request.TestId); 
+        var test = _dbContext.Tests.Find(request.TestId);
         if (test == null)
             throw new ConflictException("Test not found");
 
@@ -111,7 +110,7 @@ public sealed class TestAttemptService
             .Select(o => o.Id)
             .ToHashSet();
 
-        int score = answers.Count(a => correctOptionIds.Contains(a.SelectedOptionId));
+        var score = answers.Count(a => correctOptionIds.Contains(a.SelectedOptionId));
 
         attempt.TotalScore = score;
         attempt.IsPassed = score >= 1;

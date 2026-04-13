@@ -1,5 +1,4 @@
 using Examination.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Examination.Web.EndPoints;
 

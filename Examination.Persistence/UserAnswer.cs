@@ -1,6 +1,6 @@
 ﻿namespace Examination.Persistence;
 
-public sealed  class UserAnswer
+public sealed class UserAnswer
 {
     public int Id { get; set; }
 

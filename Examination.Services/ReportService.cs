@@ -1,4 +1,3 @@
-using Examination.Core.Dtos;
 using Examination.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +16,7 @@ public sealed class ReportService
     {
         return _dbContext.UserAttempts
             .Include(ua => ua.Test)
-            .GroupBy(ua => new { ua.TestId, ua.Test.Name })
+            .GroupBy(ua => new { ua.TestId, ua.Test!.Name })
             .Select(ua => new ReportDto
             {
                 TestId = ua.Key.TestId,
