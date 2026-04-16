@@ -8,12 +8,10 @@ namespace Examination.Web.EndPoints;
 
 public static class TestEndpoints
 {
-  
     public static IEndpointRouteBuilder MapTestGroup(this IEndpointRouteBuilder endpoints)
     {
         return endpoints.MapGroup("/tests");
     }
-
 
     public static IEndpointRouteBuilder MapTestEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -26,6 +24,7 @@ public static class TestEndpoints
         group.MapGet("", GetPublishedTests);
         group.MapGet("/{id:int}", GetTestById);
         group.MapPut("/{id:int}/publish", PublishTest);
+        group.MapDelete("/{id:int}", DeleteTest);
 
         return endpoints;
     }
@@ -36,9 +35,7 @@ public static class TestEndpoints
         {
             var result = service.CreateTest(request);
 
-            return result is null
-                ? TypedResults.Problem("Error while creating test.")
-                : TypedResults.Ok(result);
+            return TypedResults.Ok(result);
         }
         catch (ConflictException ex)
         {
@@ -46,30 +43,16 @@ public static class TestEndpoints
         }
     }
 
-    private static Ok<IEnumerable<TestDto>> GetAllTests(TestService service)
+    private static IResult GetAllTests(TestService service)
     {
-        try
-        {
-            var result = service.GetAllTests();
-            return TypedResults.Ok(result);
-        }
-        catch (ConflictException ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var result = service.GetAllTests();
+        return TypedResults.Ok(result);
     }
 
     private static IResult GetPublishedTests(TestService service)
     {
-        try
-        {
-            var result = service.GetPublishedTests();
-            return TypedResults.Ok(result);
-        }
-        catch (ConflictException ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var result = service.GetPublishedTests();
+        return TypedResults.Ok(result);
     }
 
     private static IResult GetTestById(TestService service, int id)
@@ -77,7 +60,6 @@ public static class TestEndpoints
         try
         {
             var result = service.GetTestById(id);
-
             return TypedResults.Ok(result);
         }
         catch (NotFoundException ex)
@@ -92,6 +74,23 @@ public static class TestEndpoints
         {
             service.PublishTest(id);
             return TypedResults.Ok("Test published successfully");
+        }
+        catch (NotFoundException ex)
+        {
+            return TypedResults.NotFound(ex.Message);
+        }
+        catch (ConflictException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+    }
+
+    private static IResult DeleteTest(TestService service, int id)
+    {
+        try
+        {
+            service.DeleteTest(id);
+            return TypedResults.Ok("Test deleted successfully");
         }
         catch (NotFoundException ex)
         {

@@ -1,6 +1,11 @@
-﻿namespace Examination.Core.Dtos;
+﻿public sealed class OptionDto
+{
+    public int Id { get; set; }
+    public string OptionText { get; set; }
 
-public sealed class OptionDto(
-    int Id,
-    string OptionText
-);
+    public OptionDto(int id, string optionText)
+    {
+        Id = id;
+        OptionText = optionText;
+    }
+}

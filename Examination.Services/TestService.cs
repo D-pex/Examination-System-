@@ -17,30 +17,33 @@ public sealed class TestService
 
     public TestDto CreateTest(CreateTestRequest request)
     {
-        if (string.IsNullOrEmpty(request.Name))
-            throw new ConflictException("Test name is required");
+        if (request == null)
+            throw new ConflictException("Request cannot be null");
+
+        var name = request.Name?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ConflictException("Test name cannot be empty or null");
 
         var existing = _dbContext.Tests
             .AsNoTracking()
-            .FirstOrDefault(t => t.Name == request.Name.Trim());
+            .FirstOrDefault(t => t.Name == name);
 
         if (existing != null)
             throw new ConflictException("Test already exists");
 
-
         var test = new Test
         {
-            Name = request.Name.Trim(),
+            Name = name,
             Subject = request.Subject?.Trim() ?? "",
             Description = request.Description?.Trim() ?? "",
-            Duration = request.Duration == default ? 90 : request.Duration,
+            Duration = request.Duration <= 0 ? 90 : request.Duration,
             IsPublished = false,
             CreatedAt = DateTime.UtcNow
         };
 
         _dbContext.Tests.Add(test);
         _dbContext.SaveChanges();
-
 
         return new TestDto(
             test.Id,
@@ -96,7 +99,6 @@ public sealed class TestService
         if (test == null)
             throw new NotFoundException($"Test with ID {id} not found");
 
-
         return new TestDto(
             test.Id,
             test.Name ?? "",
@@ -122,6 +124,20 @@ public sealed class TestService
             throw new ConflictException("Test is already published");
 
         test.IsPublished = true;
+        _dbContext.SaveChanges();
+    }
+
+    public void DeleteTest(int id)
+    {
+        if (id <= 0)
+            throw new ConflictException("Invalid test ID");
+
+        var test = _dbContext.Tests.FirstOrDefault(x => x.Id == id);
+
+        if (test == null)
+            throw new NotFoundException($"Test with ID {id} not found");
+
+        _dbContext.Tests.Remove(test);
         _dbContext.SaveChanges();
     }
 }
