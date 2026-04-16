@@ -56,14 +56,14 @@ public sealed class TestService
         );
     }
 
-    public IEnumerable<TestDto> GetAllTests()
+    public List<TestDto> GetAllTests()
     {
         return _dbContext.Tests
             .Select(t => new TestDto(
                 t.Id,
-                t.Name,
-                t.Subject,
-                t.Description,
+                t.Name ?? "",
+                t.Subject ?? "",
+                t.Description ?? "",
                 t.Duration,
                 t.IsPublished,
                 t.CreatedAt
@@ -115,7 +115,9 @@ public sealed class TestService
         if (id <= 0)
             throw new ConflictException("Invalid test ID");
 
-        var test = _dbContext.Tests.FirstOrDefault(x => x.Id == id);
+        var test = _dbContext.Tests
+            .Include(t => t.Questions)
+            .FirstOrDefault(x => x.Id == id);
 
         if (test == null)
             throw new NotFoundException($"Test with ID {id} not found");
@@ -123,7 +125,11 @@ public sealed class TestService
         if (test.IsPublished)
             throw new ConflictException("Test is already published");
 
+        if (test.Questions == null || test.Questions.Count == 0)
+            throw new ConflictException("Add at least one question before publishing");
+
         test.IsPublished = true;
+
         _dbContext.SaveChanges();
     }
 
@@ -132,12 +138,16 @@ public sealed class TestService
         if (id <= 0)
             throw new ConflictException("Invalid test ID");
 
-        var test = _dbContext.Tests.FirstOrDefault(x => x.Id == id);
+        var test = _dbContext.Tests
+            .Include(t => t.Questions)
+            .FirstOrDefault(x => x.Id == id);
 
         if (test == null)
             throw new NotFoundException($"Test with ID {id} not found");
 
+        _dbContext.Questions.RemoveRange(test.Questions);
         _dbContext.Tests.Remove(test);
+
         _dbContext.SaveChanges();
     }
 }

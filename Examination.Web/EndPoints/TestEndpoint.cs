@@ -2,7 +2,6 @@
 using Examination.Core.Requests;
 using Examination.Services;
 using Examination.Services.Exceptions;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Examination.Web.EndPoints;
 
@@ -20,7 +19,7 @@ public static class TestEndpoints
         var group = endpoints.MapTestGroup();
 
         group.MapPost("", CreateTest);
-        group.MapGet("/all", GetAllTests);
+        group.MapGet("/admin", GetAllTests);
         group.MapGet("", GetPublishedTests);
         group.MapGet("/{id:int}", GetTestById);
         group.MapPut("/{id:int}/publish", PublishTest);
@@ -34,25 +33,24 @@ public static class TestEndpoints
         try
         {
             var result = service.CreateTest(request);
-
-            return TypedResults.Ok(result);
+            return Results.Ok(result);
         }
         catch (ConflictException ex)
         {
-            return TypedResults.BadRequest(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
 
     private static IResult GetAllTests(TestService service)
     {
         var result = service.GetAllTests();
-        return TypedResults.Ok(result);
+        return Results.Ok(result);
     }
 
     private static IResult GetPublishedTests(TestService service)
     {
         var result = service.GetPublishedTests();
-        return TypedResults.Ok(result);
+        return Results.Ok(result);
     }
 
     private static IResult GetTestById(TestService service, int id)
@@ -60,11 +58,15 @@ public static class TestEndpoints
         try
         {
             var result = service.GetTestById(id);
-            return TypedResults.Ok(result);
+            return Results.Ok(result);
         }
         catch (NotFoundException ex)
         {
-            return TypedResults.NotFound(ex.Message);
+            return Results.NotFound(ex.Message);
+        }
+        catch (ConflictException ex)
+        {
+            return Results.BadRequest(ex.Message);
         }
     }
 
@@ -73,15 +75,15 @@ public static class TestEndpoints
         try
         {
             service.PublishTest(id);
-            return TypedResults.Ok("Test published successfully");
+            return Results.Ok();
         }
         catch (NotFoundException ex)
         {
-            return TypedResults.NotFound(ex.Message);
+            return Results.NotFound(ex.Message);
         }
         catch (ConflictException ex)
         {
-            return TypedResults.BadRequest(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
 
@@ -90,15 +92,15 @@ public static class TestEndpoints
         try
         {
             service.DeleteTest(id);
-            return TypedResults.Ok("Test deleted successfully");
+            return Results.Ok();
         }
         catch (NotFoundException ex)
         {
-            return TypedResults.NotFound(ex.Message);
+            return Results.NotFound(ex.Message);
         }
         catch (ConflictException ex)
         {
-            return TypedResults.BadRequest(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
 }

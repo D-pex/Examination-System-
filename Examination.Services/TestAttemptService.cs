@@ -13,7 +13,7 @@ public sealed class TestAttemptService
     {
         _dbContext = dbContext;
     }
-
+ 
     public UserAttemptDto StartAttempt(CreateUserAttemptRequest request)
     {
         if (request.UserId <= 0 || request.TestId <= 0)
