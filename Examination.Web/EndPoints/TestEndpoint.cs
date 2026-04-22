@@ -22,7 +22,7 @@ public static class TestEndpoints
         group.MapGet("/admin", GetAllTests);
         group.MapGet("", GetPublishedTests);
         group.MapGet("/{id:int}", GetTestById);
-        group.MapPut("/{id:int}/publish", PublishTest);
+        group.MapPatch("/{id:int}/publish", PublishTest);
         group.MapDelete("/{id:int}", DeleteTest);
 
         return endpoints;
