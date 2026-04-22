@@ -3,6 +3,7 @@ using Examination.Services;
 using Examination.Services.Exceptions;
 
 namespace Examination.Web.EndPoints;
+
 public static class TestAttemptEndpoints
 {
     public static IEndpointRouteBuilder MapTestAttemptGroup(this IEndpointRouteBuilder endpoints)
@@ -17,13 +18,14 @@ public static class TestAttemptEndpoints
         var group = endpoints.MapTestAttemptGroup();
 
         group.MapPost("/start", StartAttempt);
-        group.MapPost("/answer", SubmitAnswer);
-        group.MapPost("/{attemptId:int}/submit", SubmitTest);
+        group.MapPost("/submit-all", SubmitAllAnswers);
 
         return endpoints;
     }
 
-    private static IResult StartAttempt(TestAttemptService service, CreateUserAttemptRequest request)
+    private static IResult StartAttempt(
+        TestAttemptService service,
+        CreateUserAttemptRequest request)
     {
         try
         {
@@ -36,24 +38,14 @@ public static class TestAttemptEndpoints
         }
     }
 
-    private static IResult SubmitAnswer(TestAttemptService service, CreateSubmitAnswerRequest request)
+    private static IResult SubmitAllAnswers(
+        
+        TestAttemptService service,
+        CreateSubmitAllAnswerRequest request)
     {
         try
         {
-            service.SubmitAnswer(request);
-            return TypedResults.Ok("Answer submitted successfully");
-        }
-        catch (ConflictException ex)
-        {
-            return TypedResults.BadRequest(ex.Message);
-        }
-    }
-
-    private static IResult SubmitTest(TestAttemptService service, int attemptId)
-    {
-        try
-        {
-            var result = service.SubmitTest(attemptId);
+            var result = service.SubmitAllAnswers(request);
             return TypedResults.Ok(result);
         }
         catch (ConflictException ex)

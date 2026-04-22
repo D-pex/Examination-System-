@@ -13,7 +13,7 @@ public sealed class TestAttemptService
     {
         _dbContext = dbContext;
     }
- 
+
     public UserAttemptDto StartAttempt(CreateUserAttemptRequest request)
     {
         if (request.UserId <= 0 || request.TestId <= 0)
@@ -23,7 +23,7 @@ public sealed class TestAttemptService
         if (!userExists)
             throw new ConflictException("User not found");
 
-        var test = _dbContext.Tests.Find(request.TestId);
+        var test = _dbContext.Tests.FirstOrDefault(t => t.Id == request.TestId);
         if (test == null)
             throw new ConflictException("Test not found");
 
@@ -36,7 +36,7 @@ public sealed class TestAttemptService
             TestId = request.TestId,
             TotalScore = 0,
             IsPassed = false,
-            AttemptDate = DateTime.Now
+            AttemptDate = DateTime.UtcNow
         };
 
         _dbContext.UserAttempts.Add(attempt);
@@ -52,52 +52,70 @@ public sealed class TestAttemptService
         );
     }
 
-    public void SubmitAnswer(CreateSubmitAnswerRequest request)
+    public UserAttemptDto SubmitAllAnswers(CreateSubmitAllAnswerRequest request)
     {
-        if (request.AttemptId <= 0 || request.QuestionId <= 0 || request.SelectedOptionId <= 0)
-            throw new ConflictException("Invalid data");
+        if (request.AttemptId <= 0)
+            throw new ConflictException("Invalid AttemptId");
 
-        var attempt = _dbContext.UserAttempts.FirstOrDefault(a => a.Id == request.AttemptId);
+        var attempt = _dbContext.UserAttempts
+            .FirstOrDefault(a => a.Id == request.AttemptId);
+
         if (attempt == null)
             throw new ConflictException("Attempt not found");
 
-        var question = _dbContext.Questions.FirstOrDefault(q => q.Id == request.QuestionId);
-        if (question == null)
-            throw new ConflictException("Question not found");
+        var questions = _dbContext.Questions
+            .Where(q => q.TestId == attempt.TestId)
+            .ToList();
 
-        if (question.TestId != attempt.TestId)
-            throw new ConflictException("Question does not belong to this test");
-
-        var option = _dbContext.Options.FirstOrDefault(o => o.Id == request.SelectedOptionId);
-        if (option == null)
-            throw new ConflictException("Option not found");
-
-        if (option.QuestionId != request.QuestionId)
-            throw new ConflictException("Option does not belong to this question");
-
-        var alreadyAnswered = _dbContext.UserAnswers
-            .Any(a => a.AttemptId == request.AttemptId && a.QuestionId == request.QuestionId);
-
-        if (alreadyAnswered)
-            throw new ConflictException("Question already answered");
-
-        var answer = new UserAnswer
+        foreach (var question in questions)
         {
-            AttemptId = request.AttemptId,
-            QuestionId = request.QuestionId,
-            SelectedOptionId = request.SelectedOptionId
-        };
+            var submitted = request.Answers
+                .FirstOrDefault(a => a.QuestionId == question.Id);
 
-        _dbContext.UserAnswers.Add(answer);
+            int selectedOptionId = submitted?.SelectedOptionId ?? 0;
+
+            if (selectedOptionId > 0)
+            {
+                var option = _dbContext.Options
+                    .FirstOrDefault(o => o.Id == selectedOptionId);
+
+                if (option == null)
+                    throw new ConflictException("Option not found");
+
+                if (option.QuestionId != question.Id)
+                    throw new ConflictException("Invalid option for question");
+            }
+
+            var existing = _dbContext.UserAnswers
+                .FirstOrDefault(a =>
+                    a.AttemptId == request.AttemptId &&
+                    a.QuestionId == question.Id);
+
+            if (existing != null)
+            {
+                existing.SelectedOptionId = selectedOptionId;
+            }
+            else
+            {
+                _dbContext.UserAnswers.Add(new UserAnswer
+                {
+                    AttemptId = request.AttemptId,
+                    QuestionId = question.Id,
+                    SelectedOptionId = selectedOptionId
+                });
+            }
+        }
+
         _dbContext.SaveChanges();
+
+        return CalculateResult(attempt.Id);
     }
 
-    public UserAttemptDto SubmitTest(int attemptId)
+    private UserAttemptDto CalculateResult(int attemptId)
     {
-        if (attemptId <= 0)
-            throw new ConflictException("Invalid AttemptId");
+        var attempt = _dbContext.UserAttempts
+            .FirstOrDefault(a => a.Id == attemptId);
 
-        var attempt = _dbContext.UserAttempts.FirstOrDefault(a => a.Id == attemptId);
         if (attempt == null)
             throw new ConflictException("Attempt not found");
 
@@ -105,15 +123,16 @@ public sealed class TestAttemptService
             .Where(a => a.AttemptId == attemptId)
             .ToList();
 
-        var correctOptionIds = _dbContext.Options
-            .Where(o => o.IsCorrect)
-            .Select(o => o.Id)
-            .ToHashSet();
-
-        var score = answers.Count(a => correctOptionIds.Contains(a.SelectedOptionId));
+        var score = (
+            from ans in answers
+            join opt in _dbContext.Options
+            on ans.SelectedOptionId equals opt.Id
+            where opt.IsCorrect
+            select ans
+        ).Count();
 
         attempt.TotalScore = score;
-        attempt.IsPassed = score >= 1;
+        attempt.IsPassed = score > 0;
 
         _dbContext.SaveChanges();
 
