@@ -22,9 +22,9 @@ public sealed class ReportService
                 TestId = ua.Key.TestId,
                 TestName = ua.Key.Name,
                 TotalAttempts = ua.Count(),
-                PassedCount = ua.Count(x => x.IsPassed),
-                FailedCount = ua.Count(x => !x.IsPassed),
-                AverageScore = ua.Average(x => x.TotalScore)
+                PassedCount = ua.Count(ua => ua.IsPassed),
+                FailedCount = ua.Count(ua => !ua.IsPassed),
+                AverageScore = ua.Average(ua => ua.TotalScore)
             })
             .ToList();
     }
