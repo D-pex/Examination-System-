@@ -4,7 +4,7 @@ public sealed class UserAnswer
 {
     public int Id { get; set; }
 
-    public int AttemptId { get; set; }
+    public int UserAttemptId { get; set; }
 
     public int QuestionId { get; set; }
 

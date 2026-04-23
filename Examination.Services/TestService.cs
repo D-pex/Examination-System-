@@ -26,7 +26,6 @@ public sealed class TestService
             throw new ConflictException("Test name cannot be empty or null");
 
         var existing = _dbContext.Tests
-            .AsNoTracking()
             .FirstOrDefault(t => t.Name == name);
 
         if (existing != null)
@@ -37,7 +36,7 @@ public sealed class TestService
             Name = name,
             Subject = request.Subject?.Trim() ?? "",
             Description = request.Description?.Trim() ?? "",
-            Duration = request.Duration <= 0 ? 90 : request.Duration,
+            Duration = request.Duration <= 0 ? 60 : request.Duration,
             IsPublished = false,
             CreatedAt = DateTime.UtcNow
         };
@@ -93,11 +92,10 @@ public sealed class TestService
             throw new ConflictException("Invalid test ID");
 
         var test = _dbContext.Tests
-            .AsNoTracking()
-            .FirstOrDefault(x => x.Id == id);
+            .FirstOrDefault(t => t.Id == id);
 
         if (test == null)
-            throw new NotFoundException($"Test with ID {id} not found");
+            throw new ConflictException($"Test with ID {id} not found");
 
         return new TestDto(
             test.Id,
@@ -120,7 +118,7 @@ public sealed class TestService
             .FirstOrDefault(x => x.Id == id);
 
         if (test == null)
-            throw new NotFoundException($"Test with ID {id} not found");
+            throw new ConflictException($"Test with ID {id} not found");
 
         if (test.IsPublished)
             throw new ConflictException("Test is already published");
@@ -143,7 +141,7 @@ public sealed class TestService
             .FirstOrDefault(x => x.Id == id);
 
         if (test == null)
-            throw new NotFoundException($"Test with ID {id} not found");
+            throw new ConflictException($"Test with ID {id} not found");
 
         _dbContext.Questions.RemoveRange(test.Questions);
         _dbContext.Tests.Remove(test);

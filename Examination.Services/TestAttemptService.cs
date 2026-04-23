@@ -88,7 +88,7 @@ public sealed class TestAttemptService
 
             var existing = _dbContext.UserAnswers
                 .FirstOrDefault(a =>
-                    a.AttemptId == request.AttemptId &&
+                    a.UserAttemptId == request.AttemptId &&
                     a.QuestionId == question.Id);
 
             if (existing != null)
@@ -99,7 +99,7 @@ public sealed class TestAttemptService
             {
                 _dbContext.UserAnswers.Add(new UserAnswer
                 {
-                    AttemptId = request.AttemptId,
+                    UserAttemptId = request.AttemptId,
                     QuestionId = question.Id,
                     SelectedOptionId = selectedOptionId
                 });
@@ -120,7 +120,7 @@ public sealed class TestAttemptService
             throw new ConflictException("Attempt not found");
 
         var answers = _dbContext.UserAnswers
-            .Where(a => a.AttemptId == attemptId)
+            .Where(a => a.UserAttemptId == attemptId)
             .ToList();
 
         var score = (
