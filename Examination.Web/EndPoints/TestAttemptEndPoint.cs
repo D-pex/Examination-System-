@@ -1,3 +1,4 @@
+using Examination.Core.Dtos;
 using Examination.Core.Requests;
 using Examination.Services;
 using Examination.Services.Exceptions;
@@ -29,13 +30,14 @@ public static class TestAttemptEndpoints
     {
         try
         {
-            var result = service.StartAttempt(request);
+            UserAttemptDto result = service.StartAttempt(request);
             return TypedResults.Ok(result);
         }
         catch (ConflictException ex)
         {
             return TypedResults.BadRequest(ex.Message);
         }
+        
     }
 
     private static IResult SubmitAllAnswers(

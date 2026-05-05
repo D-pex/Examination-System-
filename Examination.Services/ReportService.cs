@@ -5,6 +5,7 @@ namespace Examination.Services;
 
 public sealed class ReportService
 {
+  
     private readonly AppDbContext _dbContext;
 
     public ReportService(AppDbContext dbContext)

@@ -2,7 +2,7 @@
 
 namespace Examination.Persistence;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) 
     : DbContext(options)
 {
     public DbSet<User> Users { get; init; }

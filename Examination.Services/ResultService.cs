@@ -32,9 +32,12 @@ public sealed class ResultService
             })
             .ToList();
     }
+    
+   
 
     public List<ResultDto> GetResultsByUser(int userId)
     {
+       
         if (userId <= 0)
             throw new ConflictException("Invalid UserId");
 
@@ -55,6 +58,7 @@ public sealed class ResultService
             })
             .ToList();
     }
+    
 
     public ResultDto GetResultByAttempt(int attemptId)
     {
@@ -83,4 +87,6 @@ public sealed class ResultService
 
         return result;
     }
+
+   
 }

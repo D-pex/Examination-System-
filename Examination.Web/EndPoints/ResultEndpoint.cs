@@ -22,7 +22,6 @@ public static class ResultEndpoints
 
         return endpoints;
     }
-
     private static IResult GetAllResults(ResultService service)
     {
         var result = service.GetAllResults();
@@ -34,6 +33,7 @@ public static class ResultEndpoints
         try
         {
             var result = service.GetResultsByUser(userId);
+
             return TypedResults.Ok(result);
         }
         catch (ConflictException ex)

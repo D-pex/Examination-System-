@@ -86,7 +86,7 @@ public sealed class TestAttemptService
                     throw new ConflictException("Invalid option for question");
             }
 
-            var existing = _dbContext.UserAnswers
+            UserAnswer? existing = _dbContext.UserAnswers
                 .FirstOrDefault(a =>
                     a.UserAttemptId == request.AttemptId &&
                     a.QuestionId == question.Id);
